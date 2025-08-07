@@ -25,7 +25,8 @@ securechat/
 ├── io/             # IO-Management
 ├── model/          # Datenmodelle
 ├── network/        # Verbindungslogik
-└── security/       # Kryptografie & Passkey-Handling
+├── security/       # Kryptografie & Passkey-Handling
+└── Main.java       # Einstiegspunkt
 ```
 
 ---
