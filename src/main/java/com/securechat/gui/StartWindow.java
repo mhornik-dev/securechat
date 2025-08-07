@@ -1,3 +1,16 @@
+/**
+ * Startfenster der Anwendung.
+ * <p>
+ * Die Klasse {@code StartWindow} stellt die grafische Oberfläche zum Aufbau und zur Verwaltung
+ * der Peer-to-Peer-Chatverbindung bereit. Von hier aus können Nutzer die Verbindung als Host
+ * oder Client initiieren, den Status überwachen sowie den Verbindungsauf- und -abbau steuern.
+ * Zudem werden Statusmeldungen und dynamische Logos basierend auf dem Verbindungsstatus angezeigt.
+ * 
+ * Die Klasse implementiert die Interfaces {@link StartWindowAccess}, {@link IOAccessReceiver} 
+ * und {@link WindowListener}, um Rückmeldungen und IO-Funktionen zu verarbeiten.
+ * 
+ * @author Milos Hornik
+ */
 package com.securechat.gui;
 
 import javax.swing.*;
@@ -28,8 +41,9 @@ public class StartWindow extends JFrame implements StartWindowAccess, IOAccessRe
     private IOAccess ioAccess;
     private JLabel logoLabel;
    
-    
-    // Konstruktor, der die Instanzen initialisiert
+    /**
+     * Erstellt das Startfenster und initialisiert alle GUI-Komponenten.
+     */
     public StartWindow() {
         setTitle("P2P Chat - Start");
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -37,27 +51,24 @@ public class StartWindow extends JFrame implements StartWindowAccess, IOAccessRe
         setLocationRelativeTo(null);
         setResizable(false);
         setLayout(new BorderLayout());
-
-        // Fügt einen WindowListener hinzu, um auf das Schließen des Fensters zu reagieren
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 onWindowClosing();
             }
         });
-
-        // Initialisiert die GUI-Komponenten
         initComponents();
         setVisible(true);
     }
 
-    // Initialisiert die GUI-Komponenten
+    /**
+     * Initialisiert die grafischen Komponenten des Fensters und setzt ActionListener.
+     */
     private void initComponents() {
 
         ConnectionState state = ConnectionState.getState();
         ImageIcon logo = getLogo(state);     
 
-        // Erstellen des Logo-Labels
         logoLabel = new JLabel(logo);
         logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
         logoLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
@@ -82,7 +93,6 @@ public class StartWindow extends JFrame implements StartWindowAccess, IOAccessRe
         disconnectButton = new JButton("Verbindung trennen");
         disconnectButton.setEnabled(false);
 
-
         statusArea = new JTextArea();
         statusArea.setEditable(false);
         statusArea.setLineWrap(true);
@@ -104,16 +114,13 @@ public class StartWindow extends JFrame implements StartWindowAccess, IOAccessRe
         add(panel, BorderLayout.CENTER);
         add(scroll, BorderLayout.SOUTH);
 
-        // ActionListener für connectButton
         connectButton.addActionListener(e -> {actionConnectButton();});
-
-        // ActionListener für disconnectButton
         disconnectButton.addActionListener(e -> {actionDisconnectButton();});
     }
 
-    /* ActionListener-Methoden */
-
-    // Action für Connect-Button
+    /**
+     * Aktion für den Connect-Button: Verbindungsaufbau einleiten.
+     */
     private void actionConnectButton() {
         isHost = hostCheck.isSelected();
         isClient = clientCheck.isSelected();
@@ -126,7 +133,9 @@ public class StartWindow extends JFrame implements StartWindowAccess, IOAccessRe
         }
     }
 
-    // Action für Disconnect-Button
+    /**
+     * Aktion für den Disconnect-Button: Verbindung trennen.
+     */
     private void actionDisconnectButton() {
         if (ioAccess != null) {
             ioAccess.closeChatWindow();
@@ -134,9 +143,9 @@ public class StartWindow extends JFrame implements StartWindowAccess, IOAccessRe
         onDisconnected();
     }
 
-    /* GUI-Zustände */
-
-    // GUI-Zustand Connected
+    /**
+     * Setzt die GUI auf den Status "Connected".
+     */
     public void connectGUIState() {
         connectButton.setEnabled(false);
         ipField.setEnabled(false);
@@ -146,7 +155,9 @@ public class StartWindow extends JFrame implements StartWindowAccess, IOAccessRe
         disconnectButton.setEnabled(true);
     }
 
-    // GUI-Zustand Disconnected
+    /**
+     * Setzt die GUI auf den Status "Disconnected".
+     */
     public void disconnectGUIState() {
         connectButton.setEnabled(true);
         ipField.setEnabled(isClient);
@@ -158,9 +169,12 @@ public class StartWindow extends JFrame implements StartWindowAccess, IOAccessRe
         disconnectButton.setEnabled(false);
     }
 
-    /* Logo-Methoden */
-
-    // Methode, die das Logo basierend auf dem Verbindungsstatus zurückgibt
+    /**
+     * Liefert das Logo-Icon passend zum Verbindungsstatus.
+     *
+     * @param state aktueller Verbindungsstatus
+     * @return passendes {@link ImageIcon}
+     */
     private ImageIcon getLogo(ConnectionState state) {
         switch (state) {
             case CONNECTED:
@@ -175,15 +189,20 @@ public class StartWindow extends JFrame implements StartWindowAccess, IOAccessRe
         }
     }
 
-    // Methode, die das Logo aktualisiert
+    /**
+     * Aktualisiert das Logo-Icon je nach Verbindungsstatus.
+     *
+     * @param state neuer Verbindungsstatus
+     */
     private void updateLogo(ConnectionState state) {
         logoLabel.setIcon(getLogo(state));
-
     }
 
-    /* ConnectionListener-Methoden */
-
-    // Methode, die aufgerufen wird, wenn das Fenster geschlossen wird
+    /**
+     * Zeigt eine Statusmeldung im Statusbereich an.
+     *
+     * @param message anzuzeigende Nachricht
+     */
     @Override
     public void onStatusUpdate(String message) {
         SwingUtilities.invokeLater(() -> {
@@ -192,7 +211,10 @@ public class StartWindow extends JFrame implements StartWindowAccess, IOAccessRe
         });
     }
 
-    // Methode, die aufgerufen wird, wenn die Verbindung hergestellt wird
+    /**
+     * Wird aufgerufen, wenn die Verbindung aufgebaut wird.
+     * Aktualisiert das Logo und den GUI-Zustand.
+     */
     @Override
     public void onConnecting() {
         SwingUtilities.invokeLater(() -> {
@@ -200,7 +222,10 @@ public class StartWindow extends JFrame implements StartWindowAccess, IOAccessRe
         });
     }
 
-    // Methode, die aufgerufen wird, wenn die Verbindung erfolgreich hergestellt wurde
+    /**
+     * Wird aufgerufen, wenn die Verbindung erfolgreich aufgebaut wurde.
+     * Aktualisiert das Logo und den GUI-Zustand.
+     */
     @Override
     public void onConnected() {
         SwingUtilities.invokeLater(() -> {
@@ -208,26 +233,29 @@ public class StartWindow extends JFrame implements StartWindowAccess, IOAccessRe
         });
     }
 
-    // Methode, die aufgerufen wird, wenn die Verbindung getrennt wird
+    /**
+     * Wird aufgerufen, wenn die Verbindung getrennt wurde.
+     * Beendet die Verbindung und aktualisiert den GUI-Zustand.
+     */
     @Override
     public void onDisconnected() {
         SwingUtilities.invokeLater(() -> {
-            // Senden der Disconnect-Nachricht an den IOAccess
             if (ioAccess != null) {
                 ioAccess.sendSystemMessage("REMOTESTATE", "DISCONNECT");
             }
-            // Schließen der Verbindung
             if (manager != null) {
                 manager.closeConnection();
                 manager = null;
             }
             updateLogo(ConnectionState.DISCONNECTED);
             disconnectGUIState();
-            
         });
     }
 
-    // Methode, die aufgerufen wird, wenn der Remote-Host/Client die Verbindung trennt
+    /**
+     * Wird aufgerufen, wenn der Remote-Host/Client die Verbindung trennt.
+     * Beendet die Verbindung und aktualisiert den GUI-Zustand.
+     */
     @Override
     public void onRemoteDisconnect() {
         SwingUtilities.invokeLater(() -> {
@@ -242,7 +270,12 @@ public class StartWindow extends JFrame implements StartWindowAccess, IOAccessRe
         });
     }
 
-    // Methode, die aufgerufen wird, wenn der Verbindungsaufbau fehlschlägt
+    /**
+     * Wird aufgerufen, wenn der Verbindungsaufbau fehlschlägt.
+     * Zeigt eine Fehlermeldung an und aktualisiert den GUI-Zustand.
+     *
+     * @param error Fehlermeldung
+     */
     @Override
     public void onConnectionFailed(String error) {
         SwingUtilities.invokeLater(() -> {
@@ -251,12 +284,13 @@ public class StartWindow extends JFrame implements StartWindowAccess, IOAccessRe
                 disconnectGUIState();
                 updateLogo(ConnectionState.FAILED);
             }
-            
-                       
         });
     }
 
-    // Methode, die aufgerufen wird, wenn der Verbindungsaufbau abgebrochen wird
+    /**
+     * Wird aufgerufen, wenn der Verbindungsaufbau abgebrochen wird.
+     * Zeigt eine Statusmeldung an und aktualisiert den GUI-Zustand.
+     */
     @Override
     public void onConnectionAborted() {
         SwingUtilities.invokeLater(() -> {
@@ -265,9 +299,10 @@ public class StartWindow extends JFrame implements StartWindowAccess, IOAccessRe
         });
     }
 
-    /* WindowListener-Methoden */
-
-    // Methode, die aufgerufen wird, wenn das Fenster geschlossen wird
+    /**
+     * Wird aufgerufen, wenn das Fenster geschlossen werden soll (z.B. durch Nutzer).
+     * Fragt nach Bestätigung und beendet das Programm.
+     */
     @Override
     public void onWindowClosing() {
         int result = JOptionPane.showConfirmDialog(
@@ -285,14 +320,13 @@ public class StartWindow extends JFrame implements StartWindowAccess, IOAccessRe
         }
     }
 
-    /* IOAccessReceiver-Methoden */
-
-    // IOAccess-Interface zuweisen, nachdem der IOManager im ConnectionManager erstellt wurde
+    /**
+     * Setzt das {@link IOAccess}-Objekt nach Erstellung des {@link IOManager}.
+     *
+     * @param ioAccess Zugriffsschnittstelle für IO
+     */
     @Override
     public void setIOAccess(IOAccess ioAccess) {
         this.ioAccess = ioAccess;
-
     }
-
-    
 }

@@ -1,3 +1,14 @@
+/**
+ * Fenster für den Peer-to-Peer-Chat.
+ * <p>
+ * Die Klasse {@code ChatWindow} stellt das Hauptfenster für die Chat-Kommunikation dar.
+ * Sie bietet ein Textfeld zur Anzeige des Chatverlaufs, ein Eingabefeld, sowie die Möglichkeit,
+ * Nachrichten zu senden und darzustellen. Die Verwaltung der Chat-Logik erfolgt über einen
+ * {@link IOManager}. Das Fenster reagiert auf Schließen-Events und informiert das Startfenster
+ * über Statusänderungen.
+ * 
+ * @author Milos Hornik
+ */
 package com.securechat.gui;
 
 import javax.swing.*;
@@ -18,12 +29,16 @@ public class ChatWindow extends JFrame implements WindowListener {
     private final Boolean isHost;
     private final StartWindowAccess startWindowAccess;
 
-
     private JTextPane chatArea;
     private JTextField inputField;
 
-
-    // Konstruktor, der die Instanzen initialisiert
+    /**
+     * Erstellt ein neues ChatWindow für Host oder Client.
+     *
+     * @param isHost             {@code true}, wenn das Fenster für den Host ist; sonst {@code false}
+     * @param ioManager          IO-Manager für Nachrichtenübermittlung
+     * @param startWindowAccess  Zugriff auf das Startfenster (Callbacks)
+     */
     public ChatWindow(Boolean isHost, IOManager ioManager, StartWindowAccess startWindowAccess) {
         this.isHost = isHost;
         this.ioManager = ioManager;
@@ -45,7 +60,9 @@ public class ChatWindow extends JFrame implements WindowListener {
         setVisible(true);
     }
 
-    // Initialisiert die GUI-Komponenten
+    /**
+     * Initialisiert die GUI-Komponenten und das Layout des Fensters.
+     */
     private void initComponents() {
         chatArea = new JTextPane();
         chatArea.setEditable(false);
@@ -65,30 +82,44 @@ public class ChatWindow extends JFrame implements WindowListener {
         add(inputPanel, BorderLayout.SOUTH);
     }
 
-    // Getter für Input-Text
+    /**
+     * Gibt den aktuellen Inhalt des Eingabefelds zurück.
+     *
+     * @return Text im Eingabefeld
+     */
     public String getInputText() {
         return inputField.getText().trim();
     }
 
-    // Methode zum Zurücksetzen des Eingabefelds
+    /**
+     * Setzt das Eingabefeld zurück.
+     */
     public void clearInput() {
         inputField.setText("");
     }
 
-    // Methode zum Anhängen einer Nachricht im Chatbereich
+    /**
+     * Hängt eine Nachricht im Chatbereich an und färbt sie.
+     *
+     * @param text  Nachrichtentext
+     * @param color Farbe für die Nachricht
+     */
     public void appendMessage(String text, Color color) {
         StyledDocument doc = chatArea.getStyledDocument();
         Style style = chatArea.addStyle("Style", null);
         StyleConstants.setForeground(style, color);
         try {
             doc.insertString(doc.getLength(), text + "\n", style);
-            chatArea.setCaretPosition(doc.getLength()); // Scroll automatisch ans Ende
+            chatArea.setCaretPosition(doc.getLength());
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
     }
 
-    // Methode, die aufgerufen wird, wenn das Fenster geschlossen wird
+    /**
+     * Wird aufgerufen, wenn das Fenster geschlossen wird.
+     * Bestätigt das Schließen und informiert das Startfenster über die Trennung.
+     */
     @Override
     public void onWindowClosing() {
         int result = JOptionPane.showConfirmDialog(
@@ -99,10 +130,9 @@ public class ChatWindow extends JFrame implements WindowListener {
         );
 
         if (result == JOptionPane.YES_OPTION) {   
-            dispose(); // Schließt das Fenster
+            dispose();
             startWindowAccess.onStatusUpdate("Chat wurde beendet");
-            startWindowAccess.onDisconnected(); // Informiere den Listener über die Trennung   
-            
+            startWindowAccess.onDisconnected();   
         }
     }
 }

@@ -1,20 +1,27 @@
+/**
+ * Einstiegspunkt der Anwendung.
+ * <p>
+ * Diese Klasse enthält die {@code main}-Methode, welche die Anwendung initialisiert,
+ * indem sie das {@link StartWindow} im Event-Dispatch-Thread startet und sichtbar macht.
+ * 
+ * @author Milos Hornik
+ */
 package com.securechat;
 
 import javax.swing.SwingUtilities;
-
 import com.securechat.gui.StartWindow;
 
-//TODO: Code optimieren
-//TODO: Alle Variablen in den Klassen deklarieren
-//TODO: Interfaces ausbauen
-
 public class Main {
+    /**
+     * Startet die Anwendung indem das Startfenster erstellt und sichtbar gemacht wird.
+     * Diese Methode wird im Event-Dispatch-Thread ausgeführt, um sicherzustellen,
+     * dass die GUI-Komponenten korrekt initialisiert und verwaltet werden.
+     *
+     * @param args Programmargumente
+     */
     public static void main(String[] args) {
-        // Startet die GUI-Anwendung im Event-Dispatch-Thread
         SwingUtilities.invokeLater(() -> {
-            // Erstellt das Startfenster der Anwendung
             StartWindow startWindow = new StartWindow();
-            // Macht das Fenster sichtbar
             startWindow.setVisible(true);
         });
     }
